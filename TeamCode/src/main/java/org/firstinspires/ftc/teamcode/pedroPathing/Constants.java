@@ -21,21 +21,22 @@ public class Constants {
             .rightRearMotorName("rear_right_drive")
             .leftRearMotorName("rear_left_drive")
             .leftFrontMotorName("front_left_drive")
-            .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE);
+            .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
 
     public static OTOSConstants localizerConstants = new OTOSConstants()
             .hardwareMapName("OTOS")
-            .linearUnit(DistanceUnit.CM)
+            .linearUnit(DistanceUnit.INCH)
             .angleUnit(AngleUnit.DEGREES)
             .offset(new SparkFunOTOS.Pose2D(-6.35,0,10))
-            .linearScalar(1)
+            .linearScalar(1.4309006303724927)
             .angularScalar(1);
 
 
-    public static FollowerConstants followerConstants = new FollowerConstants();
+    public static FollowerConstants followerConstants = new FollowerConstants()
+            .mass(8.618255);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 

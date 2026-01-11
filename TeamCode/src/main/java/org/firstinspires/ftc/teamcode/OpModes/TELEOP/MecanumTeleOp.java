@@ -35,10 +35,14 @@ import static java.lang.String.*;
 
 import android.annotation.SuppressLint;
 
+import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.telemetry.TelemetryManager;
+import com.bylazar.gamepad.PanelsGamepad;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.resources.accessoryControl;
@@ -52,6 +56,7 @@ import com.bylazar.field.Style;
 import com.bylazar.field.FieldImage;
 
 @TeleOp()
+@Configurable
 public class MecanumTeleOp extends LinearOpMode {
 
     boolean loader;
@@ -72,8 +77,8 @@ public class MecanumTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() {
         TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
-
-        accessoryControl accessoryController = new accessoryControl(hardwareMap,false);
+        Gamepad g1 = gamepad1;
+        accessoryControl accessoryController = new accessoryControl(hardwareMap,panelsTelemetry,false);
         currentSensor = hardwareMap.get(AnalogInput.class,"currentSense");
         controller = new driveKinematicController();
         controller.init(hardwareMap);
@@ -88,20 +93,20 @@ public class MecanumTeleOp extends LinearOpMode {
         while (opModeIsActive()) {
             //region Inputs
             double Drive,Drift,Turn;
-            Turn = -gamepad1.right_stick_x * 1;// steering input
+            Turn = -g1.right_stick_x * 1;// steering input
             if (controlMode == controlRelativity.Field) {
-                Drift = (gamepad1.left_stick_y * 1); // forward input
-                Drive = (-gamepad1.left_stick_x * 1);// strafe input
+                Drift = (g1.left_stick_y * 1); // forward input
+                Drive = (-g1.left_stick_x * 1);// strafe input
                 controller.fieldCentericDrive(Drive,Drift,Turn);
             }
             else {
-                Drift = (responseCurve(gamepad1.left_stick_y)); // forward input
-                Drive = (responseCurve(-gamepad1.left_stick_x)); // strafe input
+                Drift = (responseCurve(g1.left_stick_y)); // forward input
+                Drive = (responseCurve(-g1.left_stick_x)); // strafe input
                 controller.drive(Drive,Drift,Turn); //drive output
             }
             //endregion
 
-            if (gamepad1.right_bumper && !mode_down) {
+            if (g1.optionsWasPressed()) {
                 if (controlMode == controlRelativity.Field) {
                     controlMode = controlRelativity.Robot;
                 } else {
@@ -109,26 +114,24 @@ public class MecanumTeleOp extends LinearOpMode {
                 }
             }
 
-            if (!gamepad1.right_bumper && mode_down) {mode_down = false;}
+            accessoryController.RunAccessory(g1,g1);
 
-            accessoryController.RunAccessory(gamepad1,gamepad1);
-
-            //aprilTag = new AprilTagProcessor.Builder()
-            //        .setDrawAxes(false)
-            //        .setDrawCubeProjection(false)
-            //        .setDrawTagOutline(true)
-            //        .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-            //        .build();
-            //VisionPortal.Builder builder = new VisionPortal.Builder();
-            //builder.setCamera(hardwareMap.get(WebcamName.class, "MainCam"));
-            //builder.enableLiveView(false);
+            /*
+            aprilTag = new AprilTagProcessor.Builder()
+                .setDrawAxes(false)
+                .setDrawCubeProjection(false)
+                .setDrawTagOutline(true)
+                .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+                .build();
+            VisionPortal.Builder builder = new VisionPortal.Builder();
+            builder.setCamera(hardwareMap.get(WebcamName.class, "MainCam"));
+            builder.enableLiveView(false);
+            */
 
             //region Telemetry
             //Telemetry (shows up on driver hub and FTCDashboard)\\
             panelsTelemetry.addData("Status", "Run Time: " + runtime.toString());
-            panelsTelemetry.addData("Current:",(format("%.2fA",(currentSensor.getVoltage()/3.3)*50)));
-            panelsTelemetry.addData("flywheel0TPS",accessoryController.flywheel0.getVelocity());
-            panelsTelemetry.addData("flywheel1TPS",accessoryController.flywheel1.getVelocity());
+            panelsTelemetry.addData("Current:",(format("%.2fA",(currentSensor.getVoltage()/3.3)*80)));
             panelsTelemetry.update(telemetry);
             //endregionr55
         }

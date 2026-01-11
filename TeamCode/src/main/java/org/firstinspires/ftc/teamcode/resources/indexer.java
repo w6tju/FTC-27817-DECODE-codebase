@@ -1,10 +1,15 @@
 package org.firstinspires.ftc.teamcode.resources;
 
+import static org.firstinspires.ftc.teamcode.resources.robotCfg.indexer.downTime;
+import static org.firstinspires.ftc.teamcode.resources.robotCfg.indexer.inventory;
+import static org.firstinspires.ftc.teamcode.resources.robotCfg.indexer.kickerCalibration;
+
 import android.graphics.Color;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
@@ -37,15 +42,13 @@ public class indexer {
 
     TelemetryManager panelsTelemetry;
 
-    public static double[] kickerCalibration = {0,0,0};
-    public static String[] inventory = {"e","e","e"};
-    public static double downTime = 1;
-
-
     public indexer(HardwareMap hwMp, TelemetryManager pTel) {
         kCh0 = hwMp.get(Servo.class,"ch0_kicker");
         kCh1 = hwMp.get(Servo.class,"ch1_kicker");
         kCh2 = hwMp.get(Servo.class,"ch2_kicker");
+
+        kCh1.setDirection(Servo.Direction.REVERSE);
+        kCh2.setDirection(Servo.Direction.REVERSE);
 
         //CsCh0 = hwMp.get(ColorRangeSensor.class,"ch0_color");
         //CsCh1 = hwMp.get(ColorRangeSensor.class,"ch1_color");
@@ -54,6 +57,13 @@ public class indexer {
         panelsTelemetry = pTel;
     }
 
+    private void holdModu(double time) {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        while (timer.seconds()<=time) {
+            panelsTelemetry.addData("waiting","have to");
+        }
+    }
     private String getBall(NormalizedRGBA det) {
         return "e";
     }
@@ -62,9 +72,7 @@ public class indexer {
         return Arrays.binarySearch(inventory,c);
     }
 
-    private void reqChamber(int ch) {
-        ElapsedTime downTimer = new ElapsedTime();
-        downTimer.reset();
+    public void reqChamber(int ch) {
         switch (ch) {
             case 0:
                 kCh0.setPosition(kickerCalibration[0]);
@@ -76,20 +84,11 @@ public class indexer {
                 kCh2.setPosition(kickerCalibration[2]);
                 //inventory[2] = "e";
         }
-        while (downTimer.seconds()<=downTime) {
-            panelsTelemetry.addData("waiting","ch"+ch);
-        }
+        holdModu(downTime);
         kCh0.setPosition(0);
         kCh1.setPosition(0);
         kCh2.setPosition(0);
-
-    }
-
-    private void holdModu(double time) {
-        ElapsedTime timer = new ElapsedTime();
-        while (timer.seconds()<=time) {
-            panelsTelemetry.addData("waiting","have to");
-        }
+        holdModu(downTime);
     }
 
     public void updtInventory() {
@@ -104,10 +103,8 @@ public class indexer {
                 switch (req.substring(i, i + 1)) {
                     case "g":
                         reqChamber(findColor("g"));
-                        holdModu(downTime*2);
                     case "p":
                         reqChamber(findColor("p"));
-                        holdModu(downTime*2);
                 }
             }
         });
@@ -120,7 +117,10 @@ public class indexer {
         }
     }
     public void calbArms() {
-        
+        kCh0.setPosition(kickerCalibration[0]);
+        kCh1.setPosition(kickerCalibration[1]);
+        kCh2.setPosition(kickerCalibration[2]);
     }
 
+    public void passiveRun() {}
 }

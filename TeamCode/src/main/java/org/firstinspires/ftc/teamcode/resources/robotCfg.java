@@ -7,19 +7,31 @@ public class robotCfg {
     public static double WHEEL_SPEED = .25; //Maximum wheel speed (used to slow down the robot, or not)
 
     @Configurable
-    public static class launcher_intake {
-
-        //region launcher
+    public static class turret {
         public static int flywheelMaxSpeed = 2700;
-        public static double assistAmount = 0;
-        public static double assistSpeed = 0;
-        //endregion
+        public static boolean flywheel1Enabled = true;
 
-        //region intake
+        public static int motorTpr = 537;
+        public static int aziRatio = 10;
+    }
+
+    @Configurable
+    public static class intake {
         public static double intakeSpeed = 1;
-        public static double intakeTime = 0; 
+    }
 
-        //endregion
+    @Configurable
+    public static class indexer {
+        public static double[] kickerCalibration = {0.45,0,0};
+        public static String[] inventory = {"e","e","e"};
+        public static double downTime = .5;
+    }
+
+    @Configurable
+    public static class DEBUG_TOOLS {
+        public static boolean _DEBUG_ = false;
+        public static double azimuth = 0;
+        public static double elevation = 0;
     }
 
     @Configurable

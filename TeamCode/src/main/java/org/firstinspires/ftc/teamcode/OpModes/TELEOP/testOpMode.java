@@ -54,9 +54,7 @@ import org.firstinspires.ftc.teamcode.resources.driveKinematicController;
 import org.firstinspires.ftc.teamcode.resources.robotCfg;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-import static org.firstinspires.ftc.teamcode.resources.robotCfg.launcher_intake.assistSpeed;
-import static org.firstinspires.ftc.teamcode.resources.robotCfg.launcher_intake.flywheelMaxSpeed;
-import static org.firstinspires.ftc.teamcode.resources.robotCfg.launcher_intake.intakeSpeed;
+import static org.firstinspires.ftc.teamcode.resources.robotCfg.turret.flywheelMaxSpeed;
 
 @TeleOp()
 public class testOpMode extends LinearOpMode {
@@ -91,7 +89,7 @@ public class testOpMode extends LinearOpMode {
     public void runOpMode() {
         TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
-        accessoryControl accessoryController = new accessoryControl(hardwareMap,false);
+        accessoryControl accessoryController = new accessoryControl(hardwareMap, panelsTelemetry,false);
         currentSensor = hardwareMap.get(AnalogInput.class,"currentSense");
         controller = new driveKinematicController();
         controller.init(hardwareMap);
@@ -129,12 +127,6 @@ public class testOpMode extends LinearOpMode {
 
             flywheelLeft.setVelocity(flywheelMaxSpeed);
             flywheelRight.setVelocity(flywheelMaxSpeed);
-
-            assistLeft.setPower(assistSpeed);
-            assistRight.setPower(assistSpeed);
-
-            intakeLeft.setPower(intakeSpeed);
-            intakeRight.setPower(intakeSpeed);
 
 
 
